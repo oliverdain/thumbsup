@@ -12,6 +12,7 @@ RUN if [ -z "${PACKAGE_VERSION}" ]; then \
       exit 1; \
     fi;
 RUN echo "Installing thumbsup@${PACKAGE_VERSION}"
+RUN npm init -y
 RUN npm install thumbsup@${PACKAGE_VERSION}
 
 # ------------------------------------------------

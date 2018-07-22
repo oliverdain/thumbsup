@@ -9,8 +9,12 @@ jobs:
     # Run all the tests inside Docker
 
     - stage: Test
-      script: docker build -f Dockerfile.test .
-
+      script:
+        - PACKAGE_VER=2.4.0
+        - echo "Using env var ${PACKAGE_VER}"
+        - DOCKER_IMAGE="thumbsupgallery/thumbsup"
+        - docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}"
+        - docker build -f Dockerfile.release -t "${DOCKER_IMAGE}:${PACKAGE_VER}" --build-arg "PACKAGE_VERSION=${PACKAGE_VER}" .
 
     # If this is a tagged commit, publish the package to npm
 
@@ -33,7 +37,7 @@ jobs:
         script:
           - DOCKER_IMAGE="thumbsupgallery/thumbsup"
           - docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}"
-          - docker build -f Dockerfile.release -t "${DOCKER_IMAGE}:TRAVIS_TAG" --build-arg "PACKAGE_VERSION=${TRAVIS_TAG}" .
+          - docker build -f Dockerfile.release -t "${DOCKER_IMAGE}:${TRAVIS_TAG}" --build-arg "PACKAGE_VERSION=${TRAVIS_TAG}" .
           - docker tag "${DOCKER_IMAGE}:${TRAVIS_TAG}" "${DOCKER_IMAGE}:latest"
           - docker push "${DOCKER_IMAGE}:${TRAVIS_TAG}"
           - docker push "${DOCKER_IMAGE}:latest"
